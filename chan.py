@@ -1,14 +1,13 @@
 import urllib.request
 import requests
 import os
-from bs4 import BeautifulSoup
 import random
 import sys
+from bs4 import BeautifulSoup
 
 #Globals
 header = {'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"}
 file_ext_types = ['png', 'jpg', 'jpeg', 'gif', 'tiff']
-
 
 # Getting Thread Name
 def getThreadName(soup):
@@ -19,6 +18,7 @@ def getThreadName(soup):
     ThreadName = ThreadName.replace("/","_")
     ThreadName = ThreadName.replace("'\'","-")
     return ThreadName
+
 # getting path
 def getPath():
     while True:
@@ -53,9 +53,7 @@ def main():
             sys.exit("Path Already Exists")
         os.mkdir(f"{path}\{ThreadName}") #Winbloat
         path = f"{path}\{ThreadName}"
-
     print(f"Saving to: {path}")
-
     count = 0
     for a in soup.find_all('a', class_="fileThumb", href=True):
         img = f"https:{a['href']}"
