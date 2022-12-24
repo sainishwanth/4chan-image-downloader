@@ -1,7 +1,7 @@
 # 4chan-image-downloader
 
 - Recommended Usage with **THREADS ONLY**, this will not auto expand all threads in a board and recursively download them so please only try to input a single thread*
-- It Will not Auto Check the Thread for new Images. Any images present in the thread at the time of running this script *****ONLY** will be downloaded
+- It Will not Auto Check the Thread for new Images. Any images present in the thread at the time of running this script **ONLY** will be downloaded
 
 
 ## Requirements
