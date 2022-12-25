@@ -10,7 +10,7 @@ header = {'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWe
 file_ext_types = ['png', 'jpg', 'jpeg', 'gif', 'tiff']
 
 # Getting Thread Name
-def getThreadName(soup):
+def getThreadName(soup) -> str:
     ThreadName = soup.find("span", class_= "subject").get_text().strip()
     if ThreadName == "":
         ThreadName = f"Thread_{random.randint(0,100000)} "
@@ -20,40 +20,33 @@ def getThreadName(soup):
     return ThreadName
 
 # getting path
-def getPath():
+def getPath(ThreadName: str) -> str:
     while True:
         path = input("\nEnter Path: ")if int(input("1 for Custom path\n2 For Current Path: ")) == 1 else os.getcwd()
         if os.path.exists(path):
             break
         else:
             print("Directory does not exist")
+    path = os.path.abspath(f"{path}/{ThreadName}")
+    if os.path.exists(path):
+        sys.exit("Path Already Exists, Please delete or update it...")
+    os.mkdir(path)
+    print(f"Saving to: {path}")
     return path
 
 # Downloading Images
-def downloadImage(img, filename,path):
+def downloadImage(img: str, filename: str,path: str):
     urllib.request.urlretrieve(img, f"{path}/{filename}")
     print(filename)
 
 # Start Point
 def main():
-    global header, file_ext_types
     url = input("Enter URL to 4chan thread: ")
     page = requests.get(url, headers=header)
     soup = BeautifulSoup(page.content, 'html.parser')
     ThreadName = getThreadName(soup)
-    path = getPath()
+    path = getPath(ThreadName)
     print(f"Thread Name - {ThreadName}\n")
-    try:
-        if os.path.exists(f"{path}/{ThreadName}"):
-            sys.exit("Path Already Exists")
-        os.mkdir(f"{path}/{ThreadName}") #Unix
-        path = f"{path}/{ThreadName}"
-    except:
-        if os.path.exists(f"{path}\{ThreadName}"):
-            sys.exit("Path Already Exists")
-        os.mkdir(f"{path}\{ThreadName}") #Winbloat
-        path = f"{path}\{ThreadName}"
-    print(f"Saving to: {path}")
     count = 0
     for a in soup.find_all('a', class_="fileThumb", href=True):
         img = f"https:{a['href']}"
