@@ -46,3 +46,6 @@ Follow On-Screen Intructions:
 
 - Logging to check Progress
 - Auto Thread Watcher
+- Fully Working GUI
+- Changing Pages in a board
+- Downloading from multiple boards
