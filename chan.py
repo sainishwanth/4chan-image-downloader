@@ -94,6 +94,7 @@ if __name__ == '__main__':
         glob_path = input("\nEnter Path: ")if int(input("1 for Custom path\n2 For Current Path: ")) == 1 else os.getcwd()
         if os.path.exists(glob_path):
             main()
+            sys.exit("Exiting Successfully..")
         else:
             count += 1
         print(f"\nTry [{count}] - Directory does not exist, Try Again..")

@@ -2,6 +2,8 @@
 
 - It will only download from threads in a single page (or from a single thread if you choose to do so)
 - It Will not Auto Check the Thread for new Images. Any images present in the thread at the time of running this script **ONLY** will be downloaded
+- It will automatically create sub folders inside the parent path (specified by the user) named after the thread (for all threads).
+- Images retain their original quality
 
 ## Requirements
 
@@ -28,7 +30,7 @@ pip install bs4 urllib
 **Run in the following order**
 ```sh
 pip install -r requirements.txt
-git clone https://github.com/sainishwanth/4chan-image-downloader
+git clone https://github.com/sainishwanth/4chan-image-downloader && cd 4chan-image-downloader
 python chan.py
 ```
 
