@@ -10,7 +10,8 @@
 ### Libraries(Third Party)
 
 - BeautifulSoup
-- urllib
+- urllib3
+- prettytable 
 
 ```sh
 pip install bs4 urllib
@@ -24,8 +25,9 @@ pip install bs4 urllib
 - sys
 
 ## Instructions
-
+**Run in the following order**
 ```sh
+pip install -r requirements.txt
 git clone https://github.com/sainishwanth/4chan-image-downloader
 python chan.py
 ```

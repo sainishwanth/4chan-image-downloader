@@ -4,7 +4,7 @@ import os
 import random
 import sys
 from bs4 import BeautifulSoup
-
+from prettytable import PrettyTable
 header = {'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"}
 
 # Return a List containing Thread Names in a particular board
@@ -81,15 +81,20 @@ def main():
         print("Received a Single Thread Link..")
         url_list.append(url)
     thread_list = getThreadList(url_list)
+    table = PrettyTable(['URL', 'Thread'])
     for url, thread in zip(url_list, thread_list):
-        print(f"{url}\t{thread}")
+        table.add_row([url, thread])
+    print(table) 
     downloadImage(url_list, thread_list)
 
 if __name__ == '__main__':
-    while True:
-        glob_path = input("\nEnter Path: ")if int(input("Save Dir\n1 for Custom path\n2 For Current Path: ")) == 1 else os.getcwd()
+    count = 1
+    print("Save Dir")
+    while count < 4:
+        glob_path = input("\nEnter Path: ")if int(input("1 for Custom path\n2 For Current Path: ")) == 1 else os.getcwd()
         if os.path.exists(glob_path):
-            break
+            main()
         else:
-            print("Directory does not exist")
-    main()
+            count += 1
+        print(f"\nTry [{count}] - Directory does not exist, Try Again..")
+    sys.exit("Exceeded 3 Tries, Please Verify Your Paths and Retry")
