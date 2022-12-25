@@ -5,59 +5,91 @@ import random
 import sys
 from bs4 import BeautifulSoup
 
-#Globals
 header = {'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"}
-file_ext_types = ['png', 'jpg', 'jpeg', 'gif', 'tiff']
 
-# Getting Thread Name
-def getThreadName(soup) -> str:
-    ThreadName = soup.find("span", class_= "subject").get_text().strip()
-    if ThreadName == "":
-        ThreadName = f"Thread_{random.randint(0,100000)} "
-    ThreadName = ThreadName.replace(" ", "_")
-    ThreadName = ThreadName.replace("/","_")
-    ThreadName = ThreadName.replace("'\'","-")
-    return ThreadName
+# Return a List containing Thread Names in a particular board
+def getThreadList(url_list: list) -> list:
+    thread_list = []
+    for url in url_list:
+        soup = getSoup(url)
+        ThreadName = soup.find("span", class_= "subject").get_text().strip()
+        if ThreadName == "":
+            print("Recieved an Anonymous Thread..Naming it Randomly..")
+            ThreadName = f"Anonymous_{random.randint(0,100000)} "
+        ThreadName = ThreadName.replace(" ", "")
+        ThreadName = ThreadName.replace("/","")
+        ThreadName = ThreadName.replace("'\'","")
+        thread_list.append(ThreadName)
+    return thread_list
 
-# getting path
+# Returns Absolute path (Specific to your OS) 
 def getPath(ThreadName: str) -> str:
-    while True:
-        path = input("\nEnter Path: ")if int(input("1 for Custom path\n2 For Current Path: ")) == 1 else os.getcwd()
-        if os.path.exists(path):
-            break
-        else:
-            print("Directory does not exist")
-    path = os.path.abspath(f"{path}/{ThreadName}")
+    global glob_path
+    path = os.path.abspath(f"{glob_path}/{ThreadName}")
     if os.path.exists(path):
         sys.exit("Path Already Exists, Please delete or update it...")
-    os.mkdir(path)
     print(f"Saving to: {path}")
     return path
 
 # Downloading Images
-def downloadImage(img: str, filename: str,path: str):
-    urllib.request.urlretrieve(img, f"{path}/{filename}")
-    print(filename)
-
-# Start Point
-def main():
-    url = input("Enter URL to 4chan thread: ")
-    page = requests.get(url, headers=header)
-    soup = BeautifulSoup(page.content, 'html.parser')
-    ThreadName = getThreadName(soup)
-    path = getPath(ThreadName)
-    print(f"Thread Name - {ThreadName}\n")
-    count = 0
-    for a in soup.find_all('a', class_="fileThumb", href=True):
-        img = f"https:{a['href']}"
-        file_ext = img[-3:]
-        if file_ext not in file_ext_types:
-            print("Unsupported File Extension")
-            continue
-        filename = f"{ThreadName}_{count}.{file_ext}"
-        count += 1
-        downloadImage(img, filename, path)
+def downloadImage(url_list: list, thread_list: list) -> None:
+    for url, thread in zip(url_list, thread_list):
+        soup = getSoup(url)
+        path = getPath(thread)
+        print(f"Making a dir for {thread}...")
+        os.mkdir(path)
+        count = 0
+        for a in soup.find_all('a', class_="fileThumb", href=True):
+            img = f"https:{a['href']}"
+            file_ext = img[-3:]
+            if file_ext not in ['png', 'jpg', 'jpeg', 'gif', 'tiff']: # Checking for supported File Extensions
+                print("Unsupported File Extension")
+                continue
+            filename = f"{thread}_{count}.{file_ext}"
+            print(f"Saving Images {filename}")
+            urllib.request.urlretrieve(img, os.path.abspath(f"{path}/{filename}"))
+            count += 1
+        print(f"Finished {thread}..")
     print("Done..")
 
-if __name__ == "__main__":
+#Returns a List of URL's to all threads in a board (avilable on that page)
+def getUrl_List(url: str, soup: BeautifulSoup) -> list:
+    spans = soup.find_all("span", {"class": "summary"})
+    url_list = []
+    for span in spans:
+        links = span.find_all('a')
+        for link in links:
+            url_list.append(f"{url}{link['href']}")
+    return url_list
+
+# Function to get a soup Object for a specific URL
+def getSoup(url: str) -> BeautifulSoup:
+    global header
+    page = requests.get(url, headers=header)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    return soup
+
+
+def main():
+    url = input("Enter a URL or a board name (g,v,h): ")
+    if len(url) == 1:
+        url = f"https://boards.4channel.org/{url}/"
+    page = requests.get(url, headers=header)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    url_list = getUrl_List(url, soup)
+    if not url_list:
+        print("Received a Single Thread Link..")
+        url_list.append(url)
+    thread_list = getThreadList(url_list)
+    for url, thread in zip(url_list, thread_list):
+        print(f"{url}\t{thread}")
+    downloadImage(url_list, thread_list)
+
+if __name__ == '__main__':
+    while True:
+        glob_path = input("\nEnter Path: ")if int(input("Save Dir\n1 for Custom path\n2 For Current Path: ")) == 1 else os.getcwd()
+        if os.path.exists(glob_path):
+            break
+        else:
+            print("Directory does not exist")
     main()
