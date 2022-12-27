@@ -15,10 +15,6 @@
 - urllib3
 - prettytable 
 
-```sh
-pip install bs4 urllib
-```
-
 ### In-built Libraries
 
 - requests
