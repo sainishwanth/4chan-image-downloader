@@ -1,3 +1,4 @@
+# Importing Libraries
 import urllib.request
 import requests
 import os
@@ -25,8 +26,7 @@ def getThreadList(url_list: list) -> list:
         ThreadName = ThreadName.replace("'\'","")
         thread_list.append(ThreadName)
     return thread_list
-
-# Returns Absolute path (Specific to your OS) 
+# Returns Absolute path (Specific to your OS)
 def getPath(ThreadName: str) -> str:
     global glob_path
     path = os.path.abspath(f"{glob_path}/{ThreadName}")
@@ -74,7 +74,7 @@ def getSoup(url: str) -> BeautifulSoup:
     return soup
 
 
-def main():
+def main() -> int:
     url = input("Enter a URL or a board name (g,v,h): ")
     if len(url) == 1:
         url = f"https://boards.4channel.org/{url}/"
@@ -90,15 +90,19 @@ def main():
         table.add_row([url, thread])
     print(table) 
     downloadImage(url_list, thread_list)                    # Downloading Images starts here
+    return 0
 
+#Program Entry point
 if __name__ == '__main__':
     count = 1
     print("Save Dir (Sub Folders with appropriate thread names will be created. Only Mention Parent Directory)..\n")
     while count < 4:
         glob_path = input("\nEnter Path: ")if int(input("1 for Custom path\n2 For Current Path: ")) == 1 else os.getcwd()
         if os.path.exists(glob_path):
-            main()
-            sys.exit("Exiting Successfully..") # Exiting after Completion
+            if not main():
+                sys.exit("Exiting Successfully..") # Exiting after Completion
+            else:
+                sys.exit("Exited Un-Successfully..")
         else:
             count += 1 # Counting User Error
         print(f"\nTry [{count}] - Directory does not exist, Try Again..")
